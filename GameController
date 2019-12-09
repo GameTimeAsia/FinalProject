@@ -1,0 +1,131 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+public class GameController : MonoBehaviour
+{
+
+    public AudioClip over;
+    public AudioClip win;
+    public GameObject[] hazards;
+    public Vector3 spawnValues;
+    public int hazardCount;
+    public float spawnWait;
+    public float startWait;
+    public float waveWait;
+
+    public Text ScoreText;
+    public Text RestartText;
+    public Text ChallengeText;
+    public Text GameOverText;
+    public Text winText;
+    public bool GameOver;
+    public static int winning = 0;
+    private bool Restart;
+    public static bool Challenge;
+    private int score;
+    
+
+    void Start ()
+    {
+        GameOver = false;
+        Restart = false;
+        Challenge = true;
+        RestartText.text = "";
+        GameOverText.text = "";
+        score = 0;
+        UpdateScore();
+        StartCoroutine (SpawnWaves ());
+    }
+
+
+    void Update()
+    {
+        if(Restart)
+        {
+            if(Input.GetKeyDown (KeyCode.X))
+            {
+                winning = 0;
+                SceneManager.LoadScene("main");
+            }
+        }
+
+        if (Challenge)
+        {
+            ChallengeText.text = "Press C for challenge!";
+
+            if (Input.GetKeyDown(KeyCode.C))
+            {
+                winning = 0;
+                ChallengeText.text = " ";
+                Challenge = false;
+                
+            }
+        }
+
+        if (Input.GetKey("escape"))
+        {
+            Application.Quit();
+        }
+    }
+    IEnumerator SpawnWaves ()
+    {
+        yield return new WaitForSeconds(startWait);
+        while (true)
+        {
+            for (int i = 0; i < hazardCount; i++)
+            {
+                GameObject hazard = hazards[Random.Range (0,hazards.Length)];
+                Vector3 spawnPosition = new Vector3(Random.Range(-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
+                Quaternion spawnRotation = Quaternion.identity;
+                Instantiate(hazard, spawnPosition, spawnRotation);
+                yield return new WaitForSeconds(spawnWait);
+            }
+            yield return new WaitForSeconds(waveWait);
+
+            if (GameOver)
+            {
+                RestartText.text = "Press 'X' for Restart";
+                Restart = true;
+                
+                break;
+            }
+        }
+        
+    }
+    public void AddScore(int newScoreValue)
+    {
+        score += newScoreValue;
+        UpdateScore();
+    }
+
+    void UpdateScore()
+    {
+        ScoreText.text = "Points: " + score;
+        
+
+        if (score >= 100)
+        {
+            winText.text = "YOU WIN! GAME CREATED BY MICHAEL ARNETT.";
+            
+
+            GetComponent<AudioSource>().Stop();
+            AudioSource.PlayClipAtPoint(win, new Vector3(0, 0, 1f));
+            winning = 1;
+            GameOver = true;
+            Restart = true;
+        }
+    }
+
+    public void gameOver()
+    {
+        GameOverText.text = "Game Over!";
+        ChallengeText.text = " ";
+        GetComponent<AudioSource>().Stop();
+        AudioSource.PlayClipAtPoint(over, new Vector3(0, 0, 0));
+        GameOver = true;
+    }
+
+}
