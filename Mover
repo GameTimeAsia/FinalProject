@@ -1,0 +1,40 @@
+using UnityEngine;
+using System.Collections;
+
+public class Mover : MonoBehaviour
+{
+    public float speed;
+    public bool fast;
+
+    private Rigidbody rb;
+
+    void Start()
+    {
+        if(GameController.Challenge == false)
+        {
+            speed = speed * 2;
+            rb = GetComponent<Rigidbody>();
+            rb.velocity = transform.forward * speed;
+        }
+
+        if (GameController.Challenge == true)
+        {
+            rb = GetComponent<Rigidbody>();
+            rb.velocity = transform.forward * speed;
+        }
+        
+    }
+
+    void Update()
+    {
+        if (GameController.Challenge == false)
+        {
+            speed = -10;
+        }
+
+        if (GameController.Challenge == true)
+        {
+            speed = -5;
+        }
+    }
+}
